@@ -1,21 +1,44 @@
 
 import React, { useCallback, useState } from 'react';
-import ReactFlow, { addEdge, MiniMap, Controls, Background } from "reactflow";
+import ReactFlow, {
+  addEdge,
+  MiniMap,
+  Controls,
+  Background,
+  applyEdgeChanges,
+  applyNodeChanges,
+} from "reactflow";
 import "reactflow/dist/style.css";
 
-import axios from 'axios';
+import axios from "axios";
 
 const initialNodes = [
-  { id: '1', type: 'default', position: { x: 0, y: 0 }, data: { label: 'Input', text: 'Hello' }, type: 'Input' },
-  { id: '2', position: { x: 250, y: 0 }, data: { label: 'Prompt', template: 'Say this: {input}' }, type: 'Prompt' },
-  { id: '3', position: { x: 500, y: 0 }, data: { label: 'LLM' }, type: 'LLM' },
-  { id: '4', position: { x: 750, y: 0 }, data: { label: 'Output' }, type: 'Output' },
+  {
+    id: "1",
+    type: "default",
+    position: { x: 0, y: 0 },
+    data: { label: "Input", text: "Hello" },
+    type: "Input",
+  },
+  {
+    id: "2",
+    position: { x: 250, y: 0 },
+    data: { label: "Prompt", template: "Say this: {input}" },
+    type: "Prompt",
+  },
+  { id: "3", position: { x: 500, y: 0 }, data: { label: "LLM" }, type: "LLM" },
+  {
+    id: "4",
+    position: { x: 750, y: 0 },
+    data: { label: "Output" },
+    type: "Output",
+  },
 ];
 
 const initialEdges = [
-  { id: 'e1-2', source: '1', target: '2' },
-  { id: 'e2-3', source: '2', target: '3' },
-  { id: 'e3-4', source: '3', target: '4' },
+  // { id: "e1-2", source: "1", target: "2" },
+  // { id: "e2-3", source: "2", target: "3" },
+  // { id: "e3-4", source: "3", target: "4" },
 ];
 
 function App() {
@@ -23,7 +46,10 @@ function App() {
   const [edges, setEdges] = useState(initialEdges);
   const [result, setResult] = useState("");
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
+  const onConnect = useCallback(
+    (params) => setEdges((eds) => addEdge(params, eds)),
+    []
+  );
 
   const runFlow = async () => {
     const payload = {
@@ -35,13 +61,29 @@ function App() {
       edges,
     };
 
-    const res = await axios.post('http://localhost:8000/run', payload);
+    const res = await axios.post("http://localhost:8000/run", payload);
     setResult(res.data.output.join("\n"));
   };
 
+  const onNodesChange = useCallback(
+    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    []
+  );
+  const onEdgesChange = useCallback(
+    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+    []
+  );
+
   return (
     <div style={{ height: 600 }}>
-      <ReactFlow nodes={nodes} edges={edges} onConnect={onConnect} fitView>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onConnect={onConnect}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        fitView
+      >
         <MiniMap />
         <Controls />
         <Background />
