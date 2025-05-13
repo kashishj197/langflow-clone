@@ -1,6 +1,8 @@
 
 import React, { useCallback, useState } from 'react';
-import ReactFlow, { addEdge, MiniMap, Controls, Background } from "react-flow";
+import ReactFlow, { addEdge, MiniMap, Controls, Background } from "reactflow";
+import "reactflow/dist/style.css";
+
 import axios from 'axios';
 
 const initialNodes = [
